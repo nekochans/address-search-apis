@@ -9,10 +9,6 @@ services:
     volumes:
       - ./:/go/app
       - node_modules:/go/app/node_modules
-    environment:
-      DEPLOY_STAGE: ${DEPLOY_STAGE}
-      REGION: ${REGION}
-      AWS_PROFILE: ${AWS_PROFILE}
 volumes:
   node_modules:
     driver: 'local'

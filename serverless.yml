@@ -9,13 +9,12 @@ provider:
   name: aws
   runtime: go1.x
   stage: ${env:DEPLOY_STAGE}
-  region: ${env:REGION}
-  profile: ${env:PROFILE}
+  region: ${env:AWS_REGION}
+  profile: ${env:AWS_PROFILE}
   logRetentionInDays: 3
   lambdaHashingVersion: 20201221
   environment:
     DEPLOY_STAGE: ${env:DEPLOY_STAGE}
-    REGION: ${env:REGION}
   httpApi:
     cors: true
 
