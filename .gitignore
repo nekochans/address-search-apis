@@ -13,3 +13,20 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# IDE Setting Files
+.idea/
+
+# output go build
+bin/
+packaged.yaml
+
+# env file
+.env
+.envrc
+
+# Serverless directories
+.serverless
+
+# node_modules
+node_modules
