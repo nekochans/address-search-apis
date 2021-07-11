@@ -45,4 +45,4 @@ jobs:
       - name: Deploy To AWS(stg)
         env:
           SLS_DEBUG: "*"
-        run: make deploy
+        run: make serverless-deploy
