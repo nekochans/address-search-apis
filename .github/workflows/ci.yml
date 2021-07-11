@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build And Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+      - name: Docker set up
+        run: |
+          docker-compose up --build -d
+      - name: Execute test
+        run: |
+          docker-compose exec -T go make ci
+          docker-compose exec -T go make build
