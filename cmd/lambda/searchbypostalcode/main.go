@@ -10,7 +10,7 @@ import (
 
 type ResponseOkBody struct {
 	Prefecture string `json:"prefecture"`
-	Locality string `json:"locality"`
+	Locality   string `json:"locality"`
 }
 
 func createApiGatewayV2Response(statusCode int, resBodyJson []byte) events.APIGatewayV2HTTPResponse {
