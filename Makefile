@@ -22,3 +22,6 @@ lint:
 format:
 	gofmt -l -s -w .
 	goimports -w -l ./
+
+ci: lint
+	go mod tidy && git diff -s --exit-code go.sum
