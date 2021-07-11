@@ -1,0 +1,39 @@
+service: address-search-apis
+
+frameworkVersion: '>=2.0.0 <3.0.0'
+
+plugins:
+  - serverless-prune-plugin
+
+provider:
+  name: aws
+  runtime: go1.x
+  stage: ${env:DEPLOY_STAGE}
+  region: ${env:REGION}
+  profile: ${env:PROFILE}
+  logRetentionInDays: 3
+  lambdaHashingVersion: 20201221
+  environment:
+    DEPLOY_STAGE: ${env:DEPLOY_STAGE}
+    REGION: ${env:REGION}
+  httpApi:
+    cors: true
+
+custom:
+  defaultStage: dev
+  prune:
+    automatic: true
+    number: 1
+
+package:
+  patterns:
+    - '!./**'
+    - ./bin/**
+
+functions:
+  searchByPostalCode:
+    handler: bin/searchbypostalcode
+    events:
+      - httpApi:
+          method: GET
+          path: /v1/{postalCode}
