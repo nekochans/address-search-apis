@@ -1,4 +1,4 @@
-.PHONY: deps build clean serverless-deploy serverless-remove
+.PHONY: deps build clean serverless-deploy serverless-remove lint format
 deps:
 	go mod download
 	go mod tidy
@@ -14,3 +14,11 @@ serverless-deploy: clean build
 
 serverless-remove: clean build
 	npm run remove
+
+lint:
+	go vet ./...
+	golangci-lint run ./...
+
+format:
+	gofmt -l -s -w .
+	goimports -w -l ./
