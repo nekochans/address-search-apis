@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -47,7 +48,9 @@ type FindAddressesResponse struct {
 
 func (r *KenallAddressRepository) FindByPostalCode(postalCode string) (*domain.Address, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
-	req, _ := http.NewRequest("GET", "https://api.kenall.jp/v1/postalcode/"+postalCode, nil)
+
+	ctx := context.Background()
+	req, _ := http.NewRequestWithContext(ctx, "GET", "https://api.kenall.jp/v1/postalcode/"+postalCode, nil)
 	req.Header.Set("Authorization", "Token "+os.Getenv("KENALL_API_KEY"))
 
 	resp, err := client.Do(req)
