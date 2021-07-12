@@ -13,6 +13,7 @@ jobs:
       DEPLOY_STAGE: stg
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_PROFILE: ${{ secrets.AWS_PROFILE }}
+      KENALL_API_KEY: ${{ secrets.KENALL_API_KEY }}
     timeout-minutes: 5
     strategy:
       matrix:
