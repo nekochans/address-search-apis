@@ -1,4 +1,4 @@
-.PHONY: deps build clean serverless-deploy serverless-remove lint format
+.PHONY: deps build clean serverless-deploy serverless-remove lint format test test-ci ci
 deps:
 	go mod download
 	go mod tidy
@@ -23,5 +23,13 @@ format:
 	gofmt -l -s -w .
 	goimports -w -l ./
 
-ci: lint
+test:
+	go clean -testcache
+	go test -p 1 -v $$(go list ./... | grep -v /node_modules/)
+
+test-ci:
+	go clean -testcache
+	go test -p 1 -v -coverprofile coverage.out -covermode atomic $$(go list ./... | grep -v /node_modules/)
+
+ci: lint test-ci
 	go mod tidy && git diff -s --exit-code go.sum
