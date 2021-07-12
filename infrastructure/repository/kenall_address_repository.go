@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -47,7 +48,8 @@ type FindAddressesResponse struct {
 }
 
 func (r *KenallAddressRepository) FindByPostalCode(postalCode string) (*domain.Address, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
+	const timeout = 10
+	client := &http.Client{Timeout: timeout * time.Second}
 
 	ctx := context.Background()
 	req, _ := http.NewRequestWithContext(ctx, "GET", "https://api.kenall.jp/v1/postalcode/"+postalCode, nil)
@@ -61,6 +63,7 @@ func (r *KenallAddressRepository) FindByPostalCode(postalCode string) (*domain.A
 	defer func() {
 		err := resp.Body.Close()
 		if err != nil {
+			log.Fatalln(err)
 		}
 	}()
 
