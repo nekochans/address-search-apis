@@ -1,11 +1,13 @@
 package application
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
-	"time"
 
 	"github.com/nekochans/address-search-apis/domain"
 	"github.com/nekochans/address-search-apis/infrastructure/repository"
@@ -17,10 +19,49 @@ func TestMain(m *testing.M) {
 	os.Exit(status)
 }
 
+type mockResponse struct {
+	Body       string
+	StatusCode int
+	Result     *repository.FindAddressesResponse
+	Error      error
+}
+
+type successMockClient struct {
+	MockAddress *repository.Address
+}
+
+func (c *successMockClient) Do(req *http.Request) (*http.Response, error) {
+	mockResBodyData := []*repository.Address{c.MockAddress}
+
+	mockResBody := &repository.FindAddressesResponse{
+		Version:   "2021-06-30",
+		Addresses: mockResBodyData,
+	}
+
+	bodyJson, _ := json.Marshal(mockResBody)
+
+	mockRes := &mockResponse{
+		Body:       string(bodyJson),
+		StatusCode: http.StatusOK,
+		Result:     mockResBody,
+	}
+
+	return &http.Response{StatusCode: mockRes.StatusCode, Body: io.NopCloser(strings.NewReader(mockRes.Body))}, nil
+}
+
+func createSuccessMockClient(mockAddress *repository.Address) *successMockClient {
+	return &successMockClient{MockAddress: mockAddress}
+}
+
 func TestHandler(t *testing.T) {
 	t.Run("Successful FindByPostalCode", func(t *testing.T) {
-		const timeout = 10
-		client := &http.Client{Timeout: timeout * time.Second}
+		mockAddress := &repository.Address{
+			Prefecture: "東京都",
+			City:       "新宿区",
+			Town:       "市谷加賀町",
+		}
+
+		client := createSuccessMockClient(mockAddress)
 
 		repo := &repository.KenallAddressRepository{HttpClient: client}
 
