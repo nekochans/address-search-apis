@@ -9,9 +9,9 @@ type AddressScenario struct {
 }
 
 type FindByPostalCodeRequest struct {
-	postalCode string
+	PostalCode string
 }
 
 func (s *AddressScenario) FindByPostalCode(req *FindByPostalCodeRequest) (*domain.Address, error) {
-	return s.AddressRepository.FindByPostalCode(req.postalCode)
+	return s.AddressRepository.FindByPostalCode(req.PostalCode)
 }

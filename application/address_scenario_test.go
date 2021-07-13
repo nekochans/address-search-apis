@@ -69,7 +69,7 @@ func TestHandler(t *testing.T) {
 			AddressRepository: repo,
 		}
 
-		req := &FindByPostalCodeRequest{postalCode: "1620062"}
+		req := &FindByPostalCodeRequest{PostalCode: "1620062"}
 		res, err := scenario.FindByPostalCode(req)
 
 		if err != nil {
