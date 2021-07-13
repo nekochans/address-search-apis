@@ -6,12 +6,14 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/nekochans/address-search-apis/domain"
+	"github.com/nekochans/address-search-apis/infrastructure"
 )
 
-type KenallAddressRepository struct{}
+type KenallAddressRepository struct {
+	HttpClient infrastructure.HttpClient
+}
 
 type Address struct {
 	Jisx0402           string `json:"jisx0402"`
@@ -48,14 +50,11 @@ type FindAddressesResponse struct {
 }
 
 func (r *KenallAddressRepository) FindByPostalCode(postalCode string) (*domain.Address, error) {
-	const timeout = 10
-	client := &http.Client{Timeout: timeout * time.Second}
-
 	ctx := context.Background()
 	req, _ := http.NewRequestWithContext(ctx, "GET", "https://api.kenall.jp/v1/postalcode/"+postalCode, nil)
 	req.Header.Set("Authorization", "Token "+os.Getenv("KENALL_API_KEY"))
 
-	resp, err := client.Do(req)
+	resp, err := r.HttpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

@@ -1,9 +1,11 @@
 package application
 
 import (
+	"net/http"
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/nekochans/address-search-apis/domain"
 	"github.com/nekochans/address-search-apis/infrastructure/repository"
@@ -17,7 +19,10 @@ func TestMain(m *testing.M) {
 
 func TestHandler(t *testing.T) {
 	t.Run("Successful FindByPostalCode", func(t *testing.T) {
-		repo := &repository.KenallAddressRepository{}
+		const timeout = 10
+		client := &http.Client{Timeout: timeout * time.Second}
+
+		repo := &repository.KenallAddressRepository{HttpClient: client}
 
 		scenario := AddressScenario{
 			AddressRepository: repo,
