@@ -31,8 +31,8 @@ package:
     - ./bin/**
 
 functions:
-  searchByPostalCode:
-    handler: bin/searchbypostalcode
+  findByPostalCode:
+    handler: bin/findbypostalcode
     events:
       - httpApi:
           method: GET

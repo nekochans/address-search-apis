@@ -4,7 +4,7 @@ deps:
 	go mod tidy
 
 build: deps
-	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o bin/searchbypostalcode ./cmd/lambda/searchbypostalcode/main.go
+	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o bin/findbypostalcode ./cmd/lambda/findbypostalcode/main.go
 
 clean:
 	rm -rf ./bin
