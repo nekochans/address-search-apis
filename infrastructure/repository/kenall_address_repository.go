@@ -9,6 +9,7 @@ import (
 
 	"github.com/nekochans/address-search-apis/domain"
 	"github.com/nekochans/address-search-apis/infrastructure"
+	"github.com/pkg/errors"
 )
 
 type KenallAddressRepository struct {
@@ -65,6 +66,18 @@ func (r *KenallAddressRepository) FindByPostalCode(postalCode string) (*domain.A
 			log.Fatalln(err)
 		}
 	}()
+
+	if resp.StatusCode != 200 {
+		var err error
+
+		switch resp.StatusCode {
+		case 404:
+			err = domain.ErrAddressRepositoryNotFound
+		default:
+			err = domain.ErrAddressRepositoryUnexpected
+		}
+		return nil, errors.WithStack(err)
+	}
 
 	var resBody FindAddressesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&resBody); err != nil {
