@@ -22,7 +22,7 @@ func TestMain(m *testing.M) {
 type mockResponse struct {
 	Body       string
 	StatusCode int
-	Result     *repository.FindAddressesResponse
+	Result     interface{}
 	Error      error
 }
 
@@ -53,6 +53,28 @@ func createSuccessMockClient(mockAddress *repository.Address) *successMockClient
 	return &successMockClient{MockAddress: mockAddress}
 }
 
+type errorMockClient struct {
+	StatusCode  int
+	MockResBody interface{}
+}
+
+func (c *errorMockClient) Do(req *http.Request) (*http.Response, error) {
+	bodyJson, _ := json.Marshal(c.MockResBody)
+
+	mockRes := &mockResponse{
+		Body:       string(bodyJson),
+		StatusCode: c.StatusCode,
+		Result:     c.MockResBody,
+	}
+
+	return &http.Response{StatusCode: mockRes.StatusCode, Body: io.NopCloser(strings.NewReader(mockRes.Body))}, nil
+}
+
+func createErrorMockClient(statusCode int, mockResBody interface{}) *errorMockClient {
+	return &errorMockClient{StatusCode: statusCode, MockResBody: mockResBody}
+}
+
+// nolint:funlen
 func TestHandler(t *testing.T) {
 	t.Run("Successful FindByPostalCode", func(t *testing.T) {
 		mockAddress := &repository.Address{
@@ -84,6 +106,58 @@ func TestHandler(t *testing.T) {
 
 		if reflect.DeepEqual(res, expected) == false {
 			t.Error("\nActually: ", res, "\nExpected: ", expected)
+		}
+	})
+
+	t.Run("Error FindByPostalCode Address is not found", func(t *testing.T) {
+		mockResBody := &repository.Address{}
+
+		client := createErrorMockClient(404, mockResBody)
+
+		repo := &repository.KenallAddressRepository{HttpClient: client}
+
+		scenario := AddressScenario{
+			AddressRepository: repo,
+		}
+
+		req := &FindByPostalCodeRequest{PostalCode: "4040000"}
+		res, err := scenario.FindByPostalCode(req)
+
+		expected := "Address is not found"
+		if res != nil {
+			t.Error("\nActually: ", res, "\nExpected: ", expected)
+		}
+
+		if err != nil {
+			if err.Error() != expected {
+				t.Error("\nActually: ", err, "\nExpected: ", expected)
+			}
+		}
+	})
+
+	t.Run("Error FindByPostalCode Unexpected error", func(t *testing.T) {
+		mockResBody := &repository.Address{}
+
+		client := createErrorMockClient(500, mockResBody)
+
+		repo := &repository.KenallAddressRepository{HttpClient: client}
+
+		scenario := AddressScenario{
+			AddressRepository: repo,
+		}
+
+		req := &FindByPostalCodeRequest{PostalCode: "1000000"}
+		res, err := scenario.FindByPostalCode(req)
+
+		expected := "Unexpected error"
+		if res != nil {
+			t.Error("\nActually: ", res, "\nExpected: ", expected)
+		}
+
+		if err != nil {
+			if err.Error() != expected {
+				t.Error("\nActually: ", err, "\nExpected: ", expected)
+			}
 		}
 	})
 }
