@@ -67,11 +67,11 @@ func (r *KenallAddressRepository) FindByPostalCode(postalCode string) (*domain.A
 		}
 	}()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		var err error
 
 		switch resp.StatusCode {
-		case 404:
+		case http.StatusNotFound:
 			err = domain.ErrAddressRepositoryNotFound
 		default:
 			err = domain.ErrAddressRepositoryUnexpected
