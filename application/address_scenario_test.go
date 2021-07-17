@@ -74,6 +74,7 @@ func createErrorMockClient(statusCode int, mockResBody interface{}) *errorMockCl
 	return &errorMockClient{StatusCode: statusCode, MockResBody: mockResBody}
 }
 
+// nolint:funlen
 func TestHandler(t *testing.T) {
 	t.Run("Successful FindByPostalCode", func(t *testing.T) {
 		mockAddress := &repository.Address{
