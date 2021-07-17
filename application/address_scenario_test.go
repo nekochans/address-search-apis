@@ -123,9 +123,11 @@ func TestHandler(t *testing.T) {
 		res, err := scenario.FindByPostalCode(req)
 
 		expected := "Address is not found"
-		if err == nil {
+		if res != nil {
 			t.Error("\nActually: ", res, "\nExpected: ", expected)
-		} else {
+		}
+
+		if err != nil {
 			if err.Error() != expected {
 				t.Error("\nActually: ", err, "\nExpected: ", expected)
 			}
@@ -147,9 +149,11 @@ func TestHandler(t *testing.T) {
 		res, err := scenario.FindByPostalCode(req)
 
 		expected := "Unexpected error"
-		if err == nil {
+		if res != nil {
 			t.Error("\nActually: ", res, "\nExpected: ", expected)
-		} else {
+		}
+
+		if err != nil {
 			if err.Error() != expected {
 				t.Error("\nActually: ", err, "\nExpected: ", expected)
 			}
