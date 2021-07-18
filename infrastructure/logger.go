@@ -6,7 +6,7 @@ import (
 )
 
 type Logger struct {
-	zapLogger *zap.SugaredLogger
+	zapLogger *zap.Logger
 	requestId string
 }
 
@@ -35,7 +35,7 @@ func CreateLogger(requestId string) *Logger {
 	zapLogger, _ := zapConfig.Build(zap.AddCallerSkip(1))
 
 	logger := &Logger{
-		zapLogger: zapLogger.Sugar(),
+		zapLogger: zapLogger,
 		requestId: requestId,
 	}
 
@@ -43,9 +43,9 @@ func CreateLogger(requestId string) *Logger {
 }
 
 func (l *Logger) Info(msg string) {
-	l.zapLogger.Infow(msg, "requestId", l.requestId)
+	l.zapLogger.Info(msg, zap.String("requestId", l.requestId))
 }
 
 func (l *Logger) Error(msg string) {
-	l.zapLogger.Errorw(msg, "requestId", l.requestId)
+	l.zapLogger.Error(msg, zap.String("requestId", l.requestId))
 }
