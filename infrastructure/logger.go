@@ -45,3 +45,7 @@ func CreateLogger(requestId string) *Logger {
 func (l *Logger) Info(msg string) {
 	l.zapLogger.Infow(msg, "requestId", l.requestId)
 }
+
+func (l *Logger) Error(msg string) {
+	l.zapLogger.Errorw(msg, "requestId", l.requestId)
+}
