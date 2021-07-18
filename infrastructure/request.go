@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"context"
+
 	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/google/uuid"
 )

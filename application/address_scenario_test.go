@@ -1,6 +1,7 @@
 package application
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -91,7 +92,7 @@ func TestHandler(t *testing.T) {
 			AddressRepository: repo,
 		}
 
-		req := &FindByPostalCodeRequest{PostalCode: "1620062"}
+		req := &FindByPostalCodeRequest{Ctx: context.Background(), PostalCode: "1620062"}
 		res, err := scenario.FindByPostalCode(req)
 
 		if err != nil {
@@ -120,7 +121,7 @@ func TestHandler(t *testing.T) {
 			AddressRepository: repo,
 		}
 
-		req := &FindByPostalCodeRequest{PostalCode: "4040000"}
+		req := &FindByPostalCodeRequest{Ctx: context.Background(), PostalCode: "4040000"}
 		res, err := scenario.FindByPostalCode(req)
 
 		expected := "Address is not found"
@@ -146,7 +147,7 @@ func TestHandler(t *testing.T) {
 			AddressRepository: repo,
 		}
 
-		req := &FindByPostalCodeRequest{PostalCode: "1000000"}
+		req := &FindByPostalCodeRequest{Ctx: context.Background(), PostalCode: "1000000"}
 		res, err := scenario.FindByPostalCode(req)
 
 		expected := "Unexpected error"

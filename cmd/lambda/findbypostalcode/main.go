@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/nekochans/address-search-apis/infrastructure"
 	"net/http"
 	"time"
+
+	"github.com/nekochans/address-search-apis/infrastructure"
 
 	"github.com/nekochans/address-search-apis/domain"
 
@@ -60,7 +61,6 @@ func createErrorResponse(statusCode int, message string) events.APIGatewayV2HTTP
 
 func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	newCtx := infrastructure.CreateContextWithRequestId(ctx)
-	infrastructure.ExtractRequestIdFromContext(newCtx)
 
 	if val, ok := req.PathParameters["postalCode"]; ok {
 		repo := &repository.KenallAddressRepository{HttpClient: client}
@@ -69,6 +69,7 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 		}
 
 		request := &application.FindByPostalCodeRequest{
+			Ctx:        newCtx,
 			PostalCode: val,
 		}
 
