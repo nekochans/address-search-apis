@@ -42,6 +42,6 @@ func CreateLogger(requestId string) *Logger {
 	return logger
 }
 
-func (l *Logger) Info(fields ...interface{}) {
-	l.zapLogger.Info(l.requestId, fields)
+func (l *Logger) Info(msg string) {
+	l.zapLogger.Infow(msg, "requestId", l.requestId)
 }
