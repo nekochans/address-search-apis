@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/nekochans/address-search-apis/infrastructure"
+
 	"github.com/nekochans/address-search-apis/domain"
 	"github.com/nekochans/address-search-apis/infrastructure/repository"
 )
@@ -92,7 +94,8 @@ func TestHandler(t *testing.T) {
 			AddressRepository: repo,
 		}
 
-		req := &FindByPostalCodeRequest{Ctx: context.Background(), PostalCode: "1620062"}
+		ctx := context.Background()
+		req := &FindByPostalCodeRequest{Ctx: infrastructure.CreateContextWithRequestId(ctx), PostalCode: "1620062"}
 		res, err := scenario.FindByPostalCode(req)
 
 		if err != nil {
@@ -121,7 +124,8 @@ func TestHandler(t *testing.T) {
 			AddressRepository: repo,
 		}
 
-		req := &FindByPostalCodeRequest{Ctx: context.Background(), PostalCode: "4040000"}
+		ctx := context.Background()
+		req := &FindByPostalCodeRequest{Ctx: infrastructure.CreateContextWithRequestId(ctx), PostalCode: "4040000"}
 		res, err := scenario.FindByPostalCode(req)
 
 		expected := "Address is not found"
@@ -147,7 +151,8 @@ func TestHandler(t *testing.T) {
 			AddressRepository: repo,
 		}
 
-		req := &FindByPostalCodeRequest{Ctx: context.Background(), PostalCode: "1000000"}
+		ctx := context.Background()
+		req := &FindByPostalCodeRequest{Ctx: infrastructure.CreateContextWithRequestId(ctx), PostalCode: "1000000"}
 		res, err := scenario.FindByPostalCode(req)
 
 		expected := "Unexpected error"
