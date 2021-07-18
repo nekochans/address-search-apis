@@ -50,8 +50,7 @@ type FindAddressesResponse struct {
 	Addresses []*Address `json:"data"`
 }
 
-func (r *KenallAddressRepository) FindByPostalCode(postalCode string) (*domain.Address, error) {
-	ctx := context.Background()
+func (r *KenallAddressRepository) FindByPostalCode(ctx context.Context, postalCode string) (*domain.Address, error) {
 	req, _ := http.NewRequestWithContext(ctx, "GET", "https://api.kenall.jp/v1/postalcode/"+postalCode, nil)
 	req.Header.Set("Authorization", "Token "+os.Getenv("KENALL_API_KEY"))
 
