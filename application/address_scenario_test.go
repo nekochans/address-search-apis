@@ -166,4 +166,35 @@ func TestHandler(t *testing.T) {
 			}
 		}
 	})
+
+	t.Run("Error FindByPostalCode Validation error", func(t *testing.T) {
+		mockAddress := &repository.Address{
+			Prefecture: "東京都",
+			City:       "新宿区",
+			Town:       "市谷加賀町",
+		}
+
+		client := createSuccessMockClient(mockAddress)
+
+		repo := &repository.KenallAddressRepository{HttpClient: client}
+
+		scenario := AddressScenario{
+			AddressRepository: repo,
+		}
+
+		ctx := context.Background()
+		req := &FindByPostalCodeRequest{Ctx: infrastructure.CreateContextWithRequestId(ctx), PostalCode: "16200621"}
+		res, err := scenario.FindByPostalCode(req)
+
+		expected := "postalCode format is invalid"
+		if res != nil {
+			t.Error("\nActually: ", res, "\nExpected: ", expected)
+		}
+
+		if err != nil {
+			if err.Error() != expected {
+				t.Error("\nActually: ", err, "\nExpected: ", expected)
+			}
+		}
+	})
 }
