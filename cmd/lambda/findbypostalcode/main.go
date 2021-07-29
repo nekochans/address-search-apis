@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/nekochans/address-search-apis/infrastructure"
@@ -68,9 +69,11 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 			AddressRepository: repo,
 		}
 
+		postalCode := strings.ReplaceAll(val, "-", "")
+
 		request := &application.FindByPostalCodeRequest{
 			Ctx:        newCtx,
-			PostalCode: val,
+			PostalCode: postalCode,
 		}
 
 		resBody, err := scenario.FindByPostalCode(request)
@@ -82,6 +85,9 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 			case domain.ErrAddressRepositoryNotFound.Error():
 				statusCode = http.StatusNotFound
 				message = "住所が見つかりませんでした"
+			case application.ErrFindByPostalCodeValidation.Error():
+				statusCode = http.StatusUnprocessableEntity
+				message = "郵便番号のフォーマットが正しくありません"
 			default:
 				statusCode = http.StatusInternalServerError
 				message = "予期せぬエラーが発生しました"
