@@ -52,7 +52,7 @@ type FindAddressesResponse struct {
 
 func (r *KenallAddressRepository) FindByPostalCode(ctx context.Context, postalCode string) (*domain.Address, error) {
 	req, _ := http.NewRequestWithContext(ctx, "GET", "https://api.kenall.jp/v1/postalcode/"+postalCode, nil)
-	req.Header.Set("Authorization", "Token "+os.Getenv("KENALL_API_KEY"))
+	req.Header.Set("Authorization", "Token "+os.Getenv("KENALL_SECRET_KEY"))
 
 	resp, err := r.HttpClient.Do(req)
 	if err != nil {

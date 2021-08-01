@@ -10,7 +10,7 @@ services:
       - ./:/go/app
       - node_modules:/go/app/node_modules
     environment:
-      KENALL_API_KEY: ${KENALL_API_KEY}
+      KENALL_SECRET_KEY: ${KENALL_SECRET_KEY}
 volumes:
   node_modules:
     driver: 'local'
