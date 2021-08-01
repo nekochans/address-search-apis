@@ -65,6 +65,11 @@ func createErrorResponse(statusCode int, message string, httpReqId string) event
 func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	newCtx := infrastructure.CreateContextWithRequestId(ctx, req.Headers["x-request-id"])
 
+	logger := infrastructure.CreateLogger(
+		infrastructure.ExtractLambdaRequestIdFromContext(newCtx),
+		infrastructure.ExtractHttpRequestIdFromContext(newCtx),
+	)
+
 	if val, ok := req.PathParameters["postalCode"]; ok {
 		repo := &repository.KenallAddressRepository{HttpClient: client}
 		scenario := &application.AddressScenario{
@@ -93,6 +98,8 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 			default:
 				statusCode = http.StatusInternalServerError
 				message = "予期せぬエラーが発生しました"
+
+				logger.Error(err.Error())
 			}
 
 			return createErrorResponse(statusCode, message, infrastructure.ExtractHttpRequestIdFromContext(newCtx)), nil
@@ -101,6 +108,8 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 		resBodyJson, _ := json.Marshal(resBody)
 
 		res := createApiGatewayV2Response(http.StatusOK, resBodyJson, infrastructure.ExtractHttpRequestIdFromContext(newCtx))
+
+		logger.Info(string(resBodyJson))
 
 		return res, nil
 	}
