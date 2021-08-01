@@ -31,11 +31,17 @@ func init() {
 	client = &http.Client{Timeout: timeout * time.Second}
 }
 
-func createApiGatewayV2Response(statusCode int, resBodyJson []byte) events.APIGatewayV2HTTPResponse {
+func createApiGatewayV2Response(
+	ctx context.Context,
+	statusCode int,
+	resBodyJson []byte,
+) events.APIGatewayV2HTTPResponse {
 	res := events.APIGatewayV2HTTPResponse{
 		StatusCode: statusCode,
 		Headers: map[string]string{
-			"Content-Type": "application/json",
+			"Content-Type":        "application/json",
+			"X-Request-Id":        infrastructure.ExtractHttpRequestIdFromContext(ctx),
+			"X-Lambda-Request-Id": infrastructure.ExtractLambdaRequestIdFromContext(ctx),
 		},
 		Body:            string(resBodyJson),
 		IsBase64Encoded: false,
@@ -44,14 +50,16 @@ func createApiGatewayV2Response(statusCode int, resBodyJson []byte) events.APIGa
 	return res
 }
 
-func createErrorResponse(statusCode int, message string) events.APIGatewayV2HTTPResponse {
+func createErrorResponse(ctx context.Context, statusCode int, message string) events.APIGatewayV2HTTPResponse {
 	resBody := &ResponseErrorBody{Message: message}
 	resBodyJson, _ := json.Marshal(resBody)
 
 	res := events.APIGatewayV2HTTPResponse{
 		StatusCode: statusCode,
 		Headers: map[string]string{
-			"Content-Type": "application/json",
+			"Content-Type":        "application/json",
+			"X-Request-Id":        infrastructure.ExtractHttpRequestIdFromContext(ctx),
+			"X-Lambda-Request-Id": infrastructure.ExtractLambdaRequestIdFromContext(ctx),
 		},
 		Body:            string(resBodyJson),
 		IsBase64Encoded: false,
@@ -61,7 +69,12 @@ func createErrorResponse(statusCode int, message string) events.APIGatewayV2HTTP
 }
 
 func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
-	newCtx := infrastructure.CreateContextWithRequestId(ctx)
+	newCtx := infrastructure.CreateContextWithRequestId(ctx, req.Headers["x-request-id"])
+
+	logger := infrastructure.CreateLogger(
+		infrastructure.ExtractLambdaRequestIdFromContext(newCtx),
+		infrastructure.ExtractHttpRequestIdFromContext(newCtx),
+	)
 
 	if val, ok := req.PathParameters["postalCode"]; ok {
 		repo := &repository.KenallAddressRepository{HttpClient: client}
@@ -91,19 +104,27 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 			default:
 				statusCode = http.StatusInternalServerError
 				message = "予期せぬエラーが発生しました"
+
+				logger.Error(err.Error())
 			}
 
-			return createErrorResponse(statusCode, message), nil
+			return createErrorResponse(newCtx, statusCode, message), nil
 		}
 
 		resBodyJson, _ := json.Marshal(resBody)
 
-		res := createApiGatewayV2Response(http.StatusOK, resBodyJson)
+		res := createApiGatewayV2Response(newCtx, http.StatusOK, resBodyJson)
+
+		logger.Info(string(resBodyJson))
 
 		return res, nil
 	}
 
-	return createErrorResponse(http.StatusInternalServerError, "予期せぬエラーが発生しました"), nil
+	return createErrorResponse(
+		newCtx,
+		http.StatusInternalServerError,
+		"予期せぬエラーが発生しました",
+	), nil
 }
 
 func main() {
