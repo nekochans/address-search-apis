@@ -11,7 +11,7 @@ jobs:
     name: Build And Test
     runs-on: ubuntu-latest
     env:
-      KENALL_API_KEY: ${{ secrets.KENALL_API_KEY }}
+      KENALL_SECRET_KEY: ${{ secrets.KENALL_SECRET_KEY }}
     steps:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2

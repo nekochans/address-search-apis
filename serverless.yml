@@ -15,7 +15,7 @@ provider:
   lambdaHashingVersion: 20201221
   environment:
     DEPLOY_STAGE: ${env:DEPLOY_STAGE}
-    KENALL_API_KEY: ${env:KENALL_API_KEY}
+    KENALL_SECRET_KEY: ${env:KENALL_SECRET_KEY}
   httpApi:
     cors: true
 
